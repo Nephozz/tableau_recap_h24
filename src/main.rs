@@ -2,50 +2,74 @@ use std::{io::BufReader, fs::File};
 use calamine::{Reader, open_workbook, Xlsx, DataType, Range};
 use rust_xlsxwriter::{Format, Workbook, FormatAlign, Worksheet, XlsxColor, FormatBorder};
 
+const MOIS: &str = "Mai";
+const ANNEE: &str = "2023";
+const FILE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/05-2023 (réponses).xlsx";
+const SAVE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/";
+
+#[derive(Debug)]
+enum Info {
+    Date(Vec<String>),
+    B00(bool),
+    Personne(Vec<String>),
+}
+
 pub fn read_date(range: &Range<DataType>, i: u32, j: u32, dates_sheet: &mut Vec<String>) {
-        let date = range.get_value((i,j)).unwrap().to_owned().to_string();
+        let date = range.get_value((i,j))
+            .unwrap()
+            .to_owned()
+            .to_string();
         let date_parse: Vec<&str> = date.split_whitespace().collect();
         dates_sheet.push(String::from(date_parse[1]));
         dates_sheet.push(String::from(date_parse[3]));
 }
 
+pub fn read_peoples(range: &Range<DataType>, personnes_sheet: &mut Vec<String>) {
+    for i in 4..11 {
+        for j in 7..9 {
+            let personnes_bind = range.get_value((i,j));
+            match personnes_bind {
+                None | Some(DataType::Empty) => {},
+                Some(value) => {
+                    let value = Some(value)
+                        .unwrap()
+                        .to_owned()
+                        .to_string();
+                    personnes_sheet.push(value);
+                },
+            };
+        }
+    }
+}
+
 pub fn read_sheet(workbook: &mut Xlsx<BufReader<File>>, sheets: &Vec<&String>) {
-    let mut info: Vec<Vec<DataType>> = Vec::new();
-    let mut dates: Vec<Vec<String>> = Vec::new();
-    let mut personnes: Vec<Vec<DataType>> = Vec::new();
+    let mut info: Vec<Info> = Vec::new();
 
     for s in sheets {
-        let mut info_sheet: Vec<DataType> = Vec::new();
+        let b00_sheet: bool;
         let mut dates_sheet: Vec<String> = Vec::new();
-        let mut personnes_sheet: Vec<DataType> = Vec::new();
+        let mut personnes_sheet: Vec<String> = Vec::new();
 
         let range: Range<DataType> = workbook.worksheet_range(s).unwrap().unwrap();
 
         read_date(&range, 1, 3, &mut dates_sheet);
         read_date(&range, 1, 4, &mut dates_sheet);
 
-        let b00 = range.get_value((1,7)).unwrap().to_owned();
-        info_sheet.push(b00);
+        let b00: String = range.get_value((1,7))
+            .unwrap()
+            .to_owned()
+            .to_string();
+        if b00.contains("B00") {
+            b00_sheet = true;
+        } else { b00_sheet = false; };
 
-        //Créé la iste des personnes dans la demande d'accès
-        for i in 4..11 {
-            for j in 7..9 {
-                let personnes_bind = range.get_value((i,j));
-                match personnes_bind {
-                    None | Some(DataType::Empty) => {},
-                    Some(value) => {
-                        let value = Some(value).unwrap().to_owned();
-                        personnes_sheet.push(value);
-                    },
-                };
-            }
-        }
+        read_peoples(&range, &mut personnes_sheet);
 
-        println!("{:?}", dates_sheet);
-        info.push(info_sheet);
-        dates.push(dates_sheet);
-        personnes.push(personnes_sheet);
+        info.push(Info::B00(b00_sheet));
+        info.push(Info::Date(dates_sheet));
+        info.push(Info::Personne(personnes_sheet));
     }
+    println!("{:#?}", info[5]);
 }
     
 pub fn init_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str) {
@@ -97,7 +121,7 @@ pub fn init_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, 
 }
 
 fn main() {
-    let path: &'static str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/05-2023 (réponses).xlsx";
+    let path: &'static str = FILE_PATH;
     let mut reponses: Xlsx<BufReader<File>> = open_workbook(path).expect(
         "Impossible d'ouvrir le fichier !"
     );
@@ -109,27 +133,24 @@ fn main() {
         .collect();
 
     read_sheet(&mut reponses, &sheets);
-    
-    let mois: &str = "Mai";
-    let annee: &str = "2023";
 
     let mut workbook = Workbook::new();
+    let workbook_name: String = "Accès ".to_owned() + MOIS + ".xlsx";
 
     let local = workbook.add_worksheet()
-        .set_name("Local").unwrap();
-    init_sheet(local, &sheets, mois, annee);
+        .set_name("Local")
+        .expect("Impossible de renommer la feuille \"Local\"");
+    init_sheet(local, &sheets, MOIS, ANNEE);
 
     let b00 = workbook.add_worksheet()
-        .set_name("B00").unwrap();
-    init_sheet(b00, &sheets, mois, annee);
+        .set_name("B00")
+        .expect("Impossible de renommer la feuille \"B00\"");
+    init_sheet(b00, &sheets, MOIS, ANNEE);
 
     let personnes = workbook.add_worksheet()
-        .set_name("Perssonnes avec accès").unwrap();
-    init_sheet(personnes, &sheets, mois, annee);
+        .set_name("Perssonnes avec accès")
+        .expect("Impossible de renommer la feuille \"Personnes avec accès\"");
+    init_sheet(personnes, &sheets, MOIS, ANNEE);
 
-    let name: String = "Accès ".to_owned() + mois + ".xlsx";
-
-    workbook.save(
-        "C:/Users/thoma/OneDrive/Documents/Internet/H24/".to_owned() + &name
-    ).unwrap();
+    workbook.save(SAVE_PATH.to_owned() + &workbook_name).expect("Echec de la sauvegarde !");
 }
