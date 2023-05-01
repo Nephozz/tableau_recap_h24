@@ -1,12 +1,7 @@
-use calamine::{Reader, open_workbook, Xlsx};
+use calamine::{Reader, open_workbook, Xlsx, DataType, Range};
 use rust_xlsxwriter::{Format, Workbook, FormatAlign, Worksheet, XlsxColor, FormatBorder};
-
-pub fn init_table(
-    worksheet: &mut Worksheet,
-    sheets: &Vec<&String>,
-    mois: &str,
-    annee: &str)
-    {
+    
+pub fn init_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str) {
         let colors: Vec<u32> = vec![
             0x7FF584,
             0x95BDF5,
@@ -56,7 +51,7 @@ pub fn init_table(
 
 fn main() {
     let path: &'static str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/05-2023 (réponses).xlsx";
-    let reponses: Xlsx<_> = open_workbook(path).expect(
+    let mut reponses: Xlsx<_> = open_workbook(path).expect(
         "Impossible d'ouvrir le fichier !"
     );
 
@@ -66,6 +61,34 @@ fn main() {
         .filter(|&s| s.contains("TVn7"))
         .collect();
 
+    let mut info: Vec<Vec<DataType>> = Vec::new();
+    let mut personnes: Vec<Vec<DataType>> = Vec::new();
+
+    for s in &sheets {
+        let mut info_sheet: Vec<DataType> = Vec::new();
+        let mut personnes_sheet: Vec<DataType> = Vec::new();
+        let range: Range<DataType> = reponses.worksheet_range(s).unwrap().unwrap();
+
+        let date_debut = range.get_value((1,3)).unwrap().to_owned();
+        info_sheet.push(date_debut);
+
+        let date_fin = range.get_value((1,4)).unwrap().to_owned();
+        info_sheet.push(date_fin);
+
+        let b00 = range.get_value((1,7)).unwrap().to_owned();
+        info_sheet.push(b00);
+
+        for i in 4..11 {
+            for j in 7..9 {
+                let personnes_bind = range.get_value((i,j));
+                println!("{:?}", personnes_bind);
+            }
+        }
+
+        info.push(info_sheet);
+        personnes.push(personnes_sheet);
+    }
+    
     let mois: &str = "Mai";
     let annee: &str = "2023";
 
@@ -73,15 +96,15 @@ fn main() {
 
     let local = workbook.add_worksheet()
         .set_name("Local").unwrap();
-    init_table(local, &sheets, mois, annee);
+    init_sheet(local, &sheets, mois, annee);
 
     let b00 = workbook.add_worksheet()
         .set_name("B00").unwrap();
-    init_table(b00, &sheets, mois, annee);
+    init_sheet(b00, &sheets, mois, annee);
 
     let personnes = workbook.add_worksheet()
         .set_name("Perssonnes avec accès").unwrap();
-    init_table(personnes, &sheets, mois, annee);
+    init_sheet(personnes, &sheets, mois, annee);
 
     workbook.save(
         "Accès ".to_owned() + mois + ".xlsx"
