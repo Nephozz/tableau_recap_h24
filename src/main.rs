@@ -1,5 +1,52 @@
+use std::{io::BufReader, fs::File};
 use calamine::{Reader, open_workbook, Xlsx, DataType, Range};
 use rust_xlsxwriter::{Format, Workbook, FormatAlign, Worksheet, XlsxColor, FormatBorder};
+
+pub fn read_date(range: &Range<DataType>, i: u32, j: u32, dates_sheet: &mut Vec<String>) {
+        let date = range.get_value((i,j)).unwrap().to_owned().to_string();
+        let date_parse: Vec<&str> = date.split_whitespace().collect();
+        dates_sheet.push(String::from(date_parse[1]));
+        dates_sheet.push(String::from(date_parse[3]));
+}
+
+pub fn read_sheet(workbook: &mut Xlsx<BufReader<File>>, sheets: &Vec<&String>) {
+    let mut info: Vec<Vec<DataType>> = Vec::new();
+    let mut dates: Vec<Vec<String>> = Vec::new();
+    let mut personnes: Vec<Vec<DataType>> = Vec::new();
+
+    for s in sheets {
+        let mut info_sheet: Vec<DataType> = Vec::new();
+        let mut dates_sheet: Vec<String> = Vec::new();
+        let mut personnes_sheet: Vec<DataType> = Vec::new();
+
+        let range: Range<DataType> = workbook.worksheet_range(s).unwrap().unwrap();
+
+        read_date(&range, 1, 3, &mut dates_sheet);
+        read_date(&range, 1, 4, &mut dates_sheet);
+
+        let b00 = range.get_value((1,7)).unwrap().to_owned();
+        info_sheet.push(b00);
+
+        //Créé la iste des personnes dans la demande d'accès
+        for i in 4..11 {
+            for j in 7..9 {
+                let personnes_bind = range.get_value((i,j));
+                match personnes_bind {
+                    None | Some(DataType::Empty) => {},
+                    Some(value) => {
+                        let value = Some(value).unwrap().to_owned();
+                        personnes_sheet.push(value);
+                    },
+                };
+            }
+        }
+
+        println!("{:?}", dates_sheet);
+        info.push(info_sheet);
+        dates.push(dates_sheet);
+        personnes.push(personnes_sheet);
+    }
+}
     
 pub fn init_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str) {
         let colors: Vec<u32> = vec![
@@ -51,7 +98,7 @@ pub fn init_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, 
 
 fn main() {
     let path: &'static str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/05-2023 (réponses).xlsx";
-    let mut reponses: Xlsx<_> = open_workbook(path).expect(
+    let mut reponses: Xlsx<BufReader<File>> = open_workbook(path).expect(
         "Impossible d'ouvrir le fichier !"
     );
 
@@ -61,33 +108,7 @@ fn main() {
         .filter(|&s| s.contains("TVn7"))
         .collect();
 
-    let mut info: Vec<Vec<DataType>> = Vec::new();
-    let mut personnes: Vec<Vec<DataType>> = Vec::new();
-
-    for s in &sheets {
-        let mut info_sheet: Vec<DataType> = Vec::new();
-        let mut personnes_sheet: Vec<DataType> = Vec::new();
-        let range: Range<DataType> = reponses.worksheet_range(s).unwrap().unwrap();
-
-        let date_debut = range.get_value((1,3)).unwrap().to_owned();
-        info_sheet.push(date_debut);
-
-        let date_fin = range.get_value((1,4)).unwrap().to_owned();
-        info_sheet.push(date_fin);
-
-        let b00 = range.get_value((1,7)).unwrap().to_owned();
-        info_sheet.push(b00);
-
-        for i in 4..11 {
-            for j in 7..9 {
-                let personnes_bind = range.get_value((i,j));
-                println!("{:?}", personnes_bind);
-            }
-        }
-
-        info.push(info_sheet);
-        personnes.push(personnes_sheet);
-    }
+    read_sheet(&mut reponses, &sheets);
     
     let mois: &str = "Mai";
     let annee: &str = "2023";
@@ -106,7 +127,9 @@ fn main() {
         .set_name("Perssonnes avec accès").unwrap();
     init_sheet(personnes, &sheets, mois, annee);
 
+    let name: String = "Accès ".to_owned() + mois + ".xlsx";
+
     workbook.save(
-        "Accès ".to_owned() + mois + ".xlsx"
+        "C:/Users/thoma/OneDrive/Documents/Internet/H24/".to_owned() + &name
     ).unwrap();
 }
