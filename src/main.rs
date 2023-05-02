@@ -9,6 +9,17 @@ const MOIS: &str = "Mai";
 const ANNEE: &str = "2023";
 const FILE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/05-2023 (réponses).xlsx";
 const SAVE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/";
+
+pub fn get_names(personnes: Vec<Vec<String>>) -> Vec<String> {
+    let mut liste_complete: Vec<String> = personnes.clone()
+        .into_iter()
+        .flatten()
+        .collect();
+    liste_complete.sort();
+    liste_complete.dedup();
+
+    return liste_complete;
+}
     
 pub fn init_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str) {
         let colors: Vec<u32> = vec![
@@ -70,7 +81,12 @@ fn main() {
         .filter(|&s| s.contains("TVn7"))
         .collect();
 
-    read_sheet(&mut reponses, &sheets);
+    let (info, personnes) = read_sheet(&mut reponses, &sheets);
+
+    let liste_noms = get_names(personnes);
+    
+    drop(info);
+    drop(liste_noms);
 
     let mut workbook = Workbook::new();
     let workbook_name: String = "Accès ".to_owned() + MOIS + ".xlsx";
