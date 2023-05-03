@@ -1,6 +1,6 @@
 use rust_xlsxwriter::{Format, FormatAlign, Worksheet, XlsxColor, FormatBorder};
 
-const COLORS: [u32; 6] = [
+pub const COLORS: [u32; 6] = [
     0x7FF584,
     0x95BDF5,
     0xF5F37D,
@@ -41,6 +41,10 @@ let mut j: u16 = 1;
 }
 
 pub fn init_titre(worksheet: &mut Worksheet, last_col: u16, mois: &str, annee: &str) {
+    let format = Format::new().set_background_color(XlsxColor::Theme(0, 2));
+    worksheet.set_column_width(0, 17).unwrap()
+        .merge_range(0, 0, 1, 0, "", &format).unwrap();
+    
     let format = Format::new()
         .set_bold()
         .set_align(FormatAlign::Center)
@@ -58,10 +62,6 @@ pub fn init_titre(worksheet: &mut Worksheet, last_col: u16, mois: &str, annee: &
 pub fn init_local_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str) {
     let last_col: u16 = 31;
 
-    let format = Format::new().set_background_color(XlsxColor::Theme(0, 2));
-    worksheet.set_column_width(0, 17).unwrap()
-        .merge_range(0, 0, 1, 0, "", &format).unwrap();
-
     let mut i: usize = 2;
     for s in sheets {
         let slice = &s[14..s.len()];
@@ -78,10 +78,6 @@ pub fn init_local_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: 
 
 pub fn init_b00_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str, info_b00: &Vec<bool>) {
     let last_col: u16 = 31;
-
-    let format = Format::new().set_background_color(XlsxColor::Theme(0, 2));
-    worksheet.set_column_width(0, 17).unwrap()
-        .merge_range(0, 0, 1, 0, "", &format).unwrap();
 
     let mut i: usize = 2;
     let mut k: usize = 0;
@@ -103,10 +99,6 @@ pub fn init_b00_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &s
 
 pub fn init_personnes_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str, liste_noms: &Vec<String>) {
     let last_col: u16 = liste_noms.len() as u16;
-
-    let format = Format::new().set_background_color(XlsxColor::Theme(0, 2));
-    worksheet.set_column_width(0, 17).unwrap()
-        .merge_range(0, 0, 1, 0, "", &format).unwrap();
 
     let mut i: usize = 2;
     for s in sheets {
