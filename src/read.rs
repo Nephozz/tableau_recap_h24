@@ -1,13 +1,6 @@
 use std::{io::BufReader, fs::File};
 use calamine::{Reader, Xlsx, DataType, Range};
 
-#[derive(Debug)]
-pub enum Info {
-    Date(Vec<String>),
-    B00(bool),
-    //Personne(Vec<String>),
-}
-
 pub fn read_date(range: &Range<DataType>, i: u32, j: u32) -> Vec<String> {
         let mut dates_sheet: Vec<String> = Vec::new();
         let date = range.get_value((i,j))
@@ -41,9 +34,10 @@ pub fn read_peoples(range: &Range<DataType>) -> Vec<String> {
     return personnes_sheet;
 }
 
-pub fn read_sheet(workbook: &mut Xlsx<BufReader<File>>, sheets: &Vec<&String>) -> (Vec<Info>,Vec<Vec<String>>) {
-    let mut info: Vec<Info> = Vec::new();
-    let mut personnes: Vec<Vec<String>> = Vec::new();
+pub fn read_sheet(workbook: &mut Xlsx<BufReader<File>>, sheets: &Vec<&String>) -> (Vec<Vec<String>>,Vec<Vec<String>>,Vec<bool>) {
+    let mut info_dates: Vec<Vec<String>> = Vec::new();
+    let mut info_personnes: Vec<Vec<String>> = Vec::new();
+    let mut info_b00: Vec<bool> = Vec::new();
 
     for s in sheets {
         let range: Range<DataType> = workbook.worksheet_range(s).unwrap().unwrap();
@@ -56,15 +50,14 @@ pub fn read_sheet(workbook: &mut Xlsx<BufReader<File>>, sheets: &Vec<&String>) -
             .unwrap()
             .to_owned()
             .to_string();
-        if b00.contains("B00") {
-            b00_sheet = true;
-        } else { b00_sheet = false; };
+        if b00.contains("B00") {b00_sheet = true;}
+        else {b00_sheet = false;};
 
         let personnes_sheet: Vec<String> = read_peoples(&range);
 
-        info.push(Info::B00(b00_sheet));
-        info.push(Info::Date(dates_sheet));
-        personnes.push(personnes_sheet);
+        info_b00.push(b00_sheet);
+        info_dates.push(dates_sheet);
+        info_personnes.push(personnes_sheet);
     }
-    return (info, personnes);
+    return (info_dates, info_personnes, info_b00);
 }
