@@ -59,7 +59,7 @@ pub fn init_titre(worksheet: &mut Worksheet, last_col: u16, mois: &str, annee: &
         &titre, &format).unwrap();
 }
 
-pub fn init_local_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str) {
+pub fn init_date_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str) {
     let last_col: u16 = 31;
 
     let mut i: usize = 2;
@@ -72,27 +72,7 @@ pub fn init_local_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: 
         i += 1;
     }
 
-    init_jour(worksheet);
-    init_titre(worksheet, last_col, mois, annee);
-}
-
-pub fn init_b00_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mois: &str, annee: &str, info_b00: &Vec<bool>) {
-    let last_col: u16 = 31;
-
-    let mut i: usize = 2;
-    let mut k: usize = 0;
-    for s in sheets {
-        if info_b00[k] {
-            let slice = &s[14..s.len()];
-            let format = Format::new()
-                .set_background_color(XlsxColor::RGB(COLORS[k]))
-                .set_border(FormatBorder::Thin);
-            worksheet.write_string_with_format(i as u32, 0, slice, &format).unwrap();
-            i += 1;
-        }
-        k += 1;
-    }
-
+    init_table(worksheet, last_col, sheets);
     init_jour(worksheet);
     init_titre(worksheet, last_col, mois, annee);
 }
@@ -110,6 +90,31 @@ pub fn init_personnes_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, mo
         i += 1;
     }
 
+    init_table(worksheet, last_col, sheets);
     init_noms(worksheet, liste_noms);
     init_titre(worksheet, last_col, mois, annee);
+}
+
+pub fn init_table(worksheet: &mut Worksheet, last_col: u16, sheets: &Vec<&String>) {
+    let format_clair = Format::new()
+        .set_border(FormatBorder::Thin)
+        .set_align(FormatAlign::Center)
+        .set_background_color(XlsxColor::Theme(0, 0));
+    let format_sombre = Format::new()
+        .set_border(FormatBorder::Thin)
+        .set_align(FormatAlign::Center)
+        .set_background_color(XlsxColor::Theme(0, 2));
+
+    let mut i: u32 = 0;
+
+    for _s in sheets {
+        for j in 0..last_col {
+            if i%2 == 0 {
+                worksheet.write_string_with_format(i + 2, j + 1, "", &format_clair).unwrap();
+            } else {
+                worksheet.write_string_with_format(i + 2, j + 1, "", &format_sombre).unwrap();
+            }
+        }
+        i += 1;
+    }
 }
