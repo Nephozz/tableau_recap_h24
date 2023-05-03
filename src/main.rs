@@ -3,7 +3,7 @@ mod init;
 
 use std::{io::BufReader, fs::File};
 use calamine::{Reader, open_workbook, Xlsx};
-use rust_xlsxwriter::{Workbook, Worksheet, Format, FormatAlign, FormatBorder};
+use rust_xlsxwriter::{Workbook, Worksheet, Format, FormatAlign, FormatBorder, XlsxColor};
 use read::read_sheet;
 use init::{init_date_sheet, init_personnes_sheet, COLORS};
 
@@ -47,16 +47,27 @@ pub fn get_name_col(name: &String, info_personnes: &Vec<Vec<String>>) -> u16 {
 }
 
 pub fn fill_personnes(worksheet: &mut Worksheet, sheets: &Vec<&String>, info_personnes: &Vec<Vec<String>>) {
-    let format = Format::new()
+    let mut _format = Format::new();
+
+    let format_clair = Format::new()
         .set_border(FormatBorder::Thin)
-        .set_align(FormatAlign::Center);
+        .set_align(FormatAlign::Center)
+        .set_background_color(XlsxColor::Theme(0, 0));
+    let format_sombre = Format::new()
+        .set_border(FormatBorder::Thin)
+        .set_align(FormatAlign::Center)
+        .set_background_color(XlsxColor::Theme(0, 2));
+
     for i in 0..sheets.len() {
         for j in 0..info_personnes[i].len() {
+            if i%2 == 0 {_format = format_clair.clone();} 
+            else {_format = format_sombre.clone();}
+
             worksheet.write_with_format(
                     (i + 2) as u32, 
                     get_name_col(&info_personnes[i][j], info_personnes),
                     "X", 
-                    &format)
+                    &_format)
                 .unwrap();
         }
     }
