@@ -118,19 +118,19 @@ fn main() {
     let local = workbook.add_worksheet()
         .set_name("Local")
         .expect("Impossible de renommer la feuille \"Local\"");
-    init_date_sheet(local, &sheets, MOIS, ANNEE);
+    init_date_sheet(local, &sheets);
     fill_dates(local, &sheets, &info_dates);
 
     let b00 = workbook.add_worksheet()
         .set_name("B00")
         .expect("Impossible de renommer la feuille \"B00\"");
-    init_date_sheet(b00, &sheets_b00, MOIS, ANNEE);
+    init_date_sheet(b00, &sheets_b00);
     fill_dates(b00, &sheets_b00, &info_dates);
 
     let personnes = workbook.add_worksheet()
         .set_name("Personnes avec accès")
         .expect("Impossible de renommer la feuille \"Personnes avec accès\"");
-    init_personnes_sheet(personnes, &sheets, MOIS, ANNEE, &liste_noms);
+    init_personnes_sheet(personnes, &sheets, &liste_noms);
     fill_personnes(personnes, &sheets, &info_personnes);
 
     workbook.save(SAVE_PATH.to_owned() + &workbook_name).expect("Echec de la sauvegarde !");
