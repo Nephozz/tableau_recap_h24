@@ -7,9 +7,10 @@ use rust_xlsxwriter::{Workbook, Worksheet, Format, FormatAlign, FormatBorder, Xl
 use read::read_sheet;
 use init::{init_date_sheet, init_personnes_sheet, COLORS};
 
-pub const MOIS: &str = "Mai";
+pub const MOIS: &str = "Août-Septembre";
+pub const NB_MOIS: usize = 1;
 pub const ANNEE: &str = "2023";
-const FILE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/05-2023 (réponses).xlsx";
+const FILE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/09-2023-Club.xlsx";
 const SAVE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/";
 
 pub fn get_b00_sheets(sheets: Vec<&String>, info_b00: Vec<bool>) -> Vec<&String> {
@@ -59,7 +60,9 @@ pub fn fill_personnes(worksheet: &mut Worksheet, sheets: &Vec<&String>, info_per
         .set_background_color(XlsxColor::Theme(0, 2));
 
     for i in 0..sheets.len() {
-        for j in 0..info_personnes[i].len() {
+        for j in 1..info_personnes[i].len() {
+            let n = j/8;
+            println!("{}, {}, {}",i,j,n);
             if i%2 == 0 {_format = format_clair.clone();} 
             else {_format = format_sombre.clone();}
 
@@ -105,7 +108,7 @@ fn main() {
         .filter(|&s| s.contains("TVn7"))
         .collect();
 
-    println!("{}", sheets.len());
+    //println!("{}", sheets.len());
 
     let (info_dates, info_personnes, info_b00) = read_sheet(&mut reponses, &sheets);
     let liste_noms = get_names(&info_personnes);
@@ -133,5 +136,6 @@ fn main() {
     init_personnes_sheet(personnes, &sheets, &liste_noms);
     fill_personnes(personnes, &sheets, &info_personnes);
 
+    //let path = std::path::Path::new(SAVE_PATH + workbook_name);
     workbook.save(SAVE_PATH.to_owned() + &workbook_name).expect("Echec de la sauvegarde !");
 }

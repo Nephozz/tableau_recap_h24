@@ -1,13 +1,16 @@
 use rust_xlsxwriter::{Format, FormatAlign, Worksheet, XlsxColor, FormatBorder};
 use crate::{MOIS, ANNEE};
 
-pub const COLORS: [u32; 6] = [
+pub const COLORS: [u32; 9] = [
     0x7FF584,
     0x95BDF5,
     0xF5F37D,
     0xF564A0,
     0xF5C871,
     0xB27DF5,
+    0xBEFFFE,
+    0xFF9F9F,
+    0xFFFFFF,
 ];
 
 pub fn init_jour(worksheet: &mut Worksheet) {

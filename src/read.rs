@@ -10,8 +10,15 @@ pub fn read_date(range: &Range<DataType>, i: u32, j: u32) -> Vec<String> {
         let date_parse: Vec<&str> = date.split_whitespace().collect();
         dates_sheet.push(String::from(date_parse[1]));
         dates_sheet.push(String::from(date_parse[3]));
-
+        
+        //println!("{:?}", dates_sheet);
         return dates_sheet;
+}
+
+pub fn read_event() -> Vec<String> {
+    let liste_event: Vec<String> = Vec::<String>::new();
+
+    return liste_event;
 }
 
 pub fn read_peoples(range: &Range<DataType>) -> Vec<String> {
