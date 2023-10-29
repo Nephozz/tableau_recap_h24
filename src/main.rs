@@ -8,10 +8,26 @@ use read::{read_sheets, get_names, get_b00_sheets};
 use write::{create_dates_sheet, create_peoples_sheet, fill_dates, fill_peoples};
 
 pub const MOIS: &str = "Août-Septembre";
+// Pendre en compte plusieurs mois
 pub const NB_MOIS: usize = 1;
 pub const ANNEE: &str = "2023";
 const FILE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/09-2023-Club.xlsx";
 const SAVE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/";
+
+enum _Mois {
+    Janvier,
+    Fevrier,
+    Mars,
+    Avril,
+    Mai,
+    Juin,
+    Juillet,
+    Aout,
+    Septembre,
+    Octobre,
+    Novembre,
+    Decembre
+}
 
 
 fn main() {
