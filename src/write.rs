@@ -16,7 +16,6 @@ pub const COLORS: [u32; 9] = [
 
 /* init_calendar : initialise le calandrier pour le récap
 worksheet : &Worsheet, nouvelle feuille où l'on veut faire un récap journalier
-Return : void
 */
 pub fn init_calendar(worksheet: &mut Worksheet) {
     for j in 1..32 {
@@ -36,7 +35,7 @@ peoples : &mut Worksheet, nouvelle feuille où l'on veut inscrire les noms de pe
 names_list : &Vec<String>, liste des noms (unique) des personnes ayant les accès
 sheets : &Vec<&String>, ensenble des demandes triées
 last_col: u16, ?
-    TODO
+TODO
 Return : void
 */
 pub fn init_names(peoples: &mut Worksheet, names_list: &Vec<String>, sheets: &Vec<&String>, last_col: u16) {
@@ -97,8 +96,12 @@ pub fn write_title(worksheet: &mut Worksheet, first_row: u32, last_col: u16) {
         &title, &format).unwrap();
 }
 
-//TODO
-pub fn create_dates_sheets(worksheet: &mut Worksheet, sheets: &Vec<&String>) {
+/* create_dates_sheet : créer une feuille des accès par jour
+worksheet: &mut Worksheet, 
+sheets: &Vec<&String>,
+TODO
+*/
+pub fn create_dates_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>) {
     let last_col: u16 = 31;
 
     init_event(worksheet, sheets, 0);
@@ -107,7 +110,12 @@ pub fn create_dates_sheets(worksheet: &mut Worksheet, sheets: &Vec<&String>) {
     write_title(worksheet, 0, last_col);
 }
 
-//TODO
+/* create_peoples_sheet : créer une feuille des accès par personne
+worksheet: &mut Worksheet, 
+sheets: &Vec<&String>,
+name_list : &Vec<String>,
+TODO
+*/
 pub fn create_peoples_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, names_list: &Vec<String>) {
     let last_col: u16 = 8 as u16;
 
@@ -117,7 +125,13 @@ pub fn create_peoples_sheet(worksheet: &mut Worksheet, sheets: &Vec<&String>, na
     write_title(worksheet, 0, last_col);
 }
 
-//TODO
+/* init_table : ?
+worksheet: &mut Worksheet, 
+first_row:u32, 
+last_col: u16,
+sheets: &Vec<&String>,
+TODO
+*/
 pub fn init_table(worksheet: &mut Worksheet, first_row:u32, last_col: u16, sheets: &Vec<&String>) {
     let bright_format = Format::new()
         .set_border(FormatBorder::Thin)
@@ -142,7 +156,12 @@ pub fn init_table(worksheet: &mut Worksheet, first_row:u32, last_col: u16, sheet
     }
 }
 
-//TODO
+/*init_event : ?
+worksheet: &mut Worksheet, 
+sheets: &Vec<&String>, 
+first_row: u32
+TODO
+*/
 pub fn init_event(worksheet: &mut Worksheet, sheets: &Vec<&String>, first_row: u32) {
     let mut i: usize = (first_row + 2) as usize;
     let mut k = 0;
