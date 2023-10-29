@@ -26,8 +26,8 @@ pub fn read_date(range: &Range<DataType>, i: u32, j: u32) -> Vec<String> {
 /* read_events : ?
 TODO
  */
-pub fn read_events() -> Vec<String> {
-    let event_lists: Vec<String> = Vec::<String>::new();
+pub fn _read_events() -> Vec<String> {
+    let events_list: Vec<String> = Vec::<String>::new();
 
     return events_list;
 }
@@ -40,8 +40,9 @@ range : &Range<DataType,
 TODO
 Return : un booléen correspondant
  */
-pub fn read_state(range: &Range<DataType>) -> bool {
+pub fn _read_state(_range: &Range<DataType>) -> bool {
     //TODO
+    return true;
 }
 
 

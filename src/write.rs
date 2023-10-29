@@ -1,5 +1,6 @@
 use rust_xlsxwriter::{Format, FormatAlign, Worksheet, XlsxColor, FormatBorder};
 use crate::{MOIS, ANNEE};
+use crate::read::get_name_col;
 
 pub const COLORS: [u32; 9] = [
     0x7FF584,
@@ -177,13 +178,13 @@ pub fn init_event(worksheet: &mut Worksheet, sheets: &Vec<&String>, first_row: u
     }
 }
 
-/* fill_personnes : remplit les noms des personnes ayant les accès sur le mois
+/* fill_peoples : remplit les noms des personnes ayant les accès sur le mois
 worksheet : &mut Worksheet, feuille des accès par personne
 sheets : ensemble des feuilles triées
 peoples_info : ?
 TODO
 */
-pub fn fill_personnes(worksheet: &mut Worksheet, sheets: &Vec<&String>, peoples_info: &Vec<Vec<String>>) {
+pub fn fill_peoples(worksheet: &mut Worksheet, sheets: &Vec<&String>, peoples_info: &Vec<Vec<String>>) {
     let mut _format = Format::new();
 
     let format_clair = Format::new()

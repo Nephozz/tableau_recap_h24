@@ -3,9 +3,9 @@ mod write;
 
 use std::{io::BufReader, fs::File};
 use calamine::{Reader, open_workbook, Xlsx};
-use rust_xlsxwriter::{Workbook, Worksheet, Format, FormatAlign, FormatBorder, XlsxColor};
-use read::read_sheet;
-use init::{create_dates_sheet, create_peoples_sheet, COLORS};
+use rust_xlsxwriter::Workbook;
+use read::{read_sheets, get_names, get_b00_sheets};
+use write::{create_dates_sheet, create_peoples_sheet, fill_dates, fill_peoples};
 
 pub const MOIS: &str = "Août-Septembre";
 pub const NB_MOIS: usize = 1;
@@ -28,7 +28,7 @@ fn main() {
 
     //println!("{}", sheets.len());
 
-    let (dates_info, peoples_info, b00_info) = read_sheet(&mut answers, &sheets);
+    let (dates_info, peoples_info, b00_info) = read_sheets(&mut answers, &sheets);
     let names_list = get_names(&peoples_info);
     let sheets_b00 = get_b00_sheets(sheets.clone(), b00_info);
     
