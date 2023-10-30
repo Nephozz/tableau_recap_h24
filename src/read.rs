@@ -6,6 +6,7 @@ use calamine::{Reader, Xlsx, DataType, Range};
 range : &Range<DateType>, 
 TODO
 i : u32, numéro de ligne de la cellule lue
+TODO par défaut i = 1
 j : u32, numéro de colonne de la cellule lue
 Return : Vec<String>, Liste contenant une date et une heure
 */
@@ -14,7 +15,7 @@ pub fn read_date(range: &Range<DataType>, i: u32, j: u32) -> Vec<String> {
         let mut dates_sheet: Vec<String> = Vec::new();
 
         let date: Result<_, &str> = match range.get_value((i,j)) {
-            None | Some(DataType::Empty) => { Err("Cellule vide !") },
+            None | Some(DataType::Empty) => { Err("Erreur, la cellule vide !") },
             Some(value) => { Ok(value.to_string()) }
         };
 
@@ -110,7 +111,7 @@ pub fn read_sheets(workbook: &mut Xlsx<BufReader<File>>, sheets: &Vec<&String>) 
             .unwrap()
             .to_owned()
             .to_string();
-        
+
         if b00.contains("B00") {is_b00_sheet = true;}
         else {is_b00_sheet = false;};
 
