@@ -7,12 +7,12 @@ use rust_xlsxwriter::Workbook;
 use read::{read_sheets, get_names, get_b00_sheets};
 use write::{create_dates_sheet, create_peoples_sheet, fill_dates, fill_peoples};
 
-pub const MOIS: &str = "Août-Septembre";
+pub const MOIS: &str = "Décembre";
 // Pendre en compte plusieurs mois
 pub const NB_MOIS: usize = 1;
 pub const ANNEE: &str = "2023";
-const FILE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/09-2023-Club.xlsx";
-const SAVE_PATH: &str = "C:/Users/thoma/OneDrive/Documents/Internet/H24/";
+const FILE_PATH: &str = "./input/12-2023 (rÃ©ponses).xlsx";
+const SAVE_PATH: &str = "./output/";
 
 enum _Mois {
     Janvier,
@@ -31,6 +31,8 @@ enum _Mois {
 
 
 fn main() {
+    //env::set_var("RUST_BACKTRACE", "1");
+
     let path: &'static str = FILE_PATH;
     let mut answers: Xlsx<BufReader<File>> = open_workbook(path).expect(
         "Impossible d'ouvrir le fichier !"
@@ -42,11 +44,14 @@ fn main() {
         .filter(|&s| s.contains("TVn7"))
         .collect();
 
-    //println!("{}", sheets.len());
+    //println!("sheets : {}", sheets.len());
 
     let (dates_info, peoples_info, b00_info) = read_sheets(&mut answers, &sheets);
-    let names_list = get_names(&peoples_info);
-    let sheets_b00 = get_b00_sheets(sheets.clone(), b00_info);
+    let names_list = get_names(&peoples_info); 
+
+    //println!("dates : {:?}", dates_info);
+    //println!("personnes : {:?}", peoples_info);
+    //println!("b00 : {:?}", b00_info);
     
 
     let mut workbook = Workbook::new();
@@ -58,11 +63,15 @@ fn main() {
     create_dates_sheet(local, &sheets);
     fill_dates(local, &sheets, &dates_info);
 
-    let b00 = workbook.add_worksheet()
-        .set_name("B00")
-        .expect("Impossible de renommer la feuille \"B00\"");
-    create_dates_sheet(b00, &sheets_b00);
-    fill_dates(b00, &sheets_b00, &dates_info);
+    if b00_info.contains(&true) {
+        let sheets_b00 = get_b00_sheets(sheets.clone(), b00_info);
+
+        let b00 = workbook.add_worksheet()
+            .set_name("B00")
+            .expect("Impossible de renommer la feuille \"B00\"");
+        create_dates_sheet(b00, &sheets_b00);
+        fill_dates(b00, &sheets_b00, &dates_info);
+    }
 
     let peoples = workbook.add_worksheet()
         .set_name("Personnes avec accès")

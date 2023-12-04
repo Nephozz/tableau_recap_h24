@@ -14,13 +14,11 @@ Return : Vec<String>, Liste contenant une date et une heure
 pub fn read_date(range: &Range<DataType>, i: u32, j: u32) -> Vec<String> {
         let mut dates_sheet: Vec<String> = Vec::new();
 
-        let date: Result<_, &str> = match range.get_value((i,j)) {
-            None | Some(DataType::Empty) => { Err("Erreur, la cellule vide !") },
-            Some(value) => { Ok(value.to_string()) }
-        };
+        let date = range.get_value((i,j))
+            .unwrap()
+            .to_string();
 
-        let date_binding = date.unwrap();
-        let date_parse: Vec<&str> = date_binding.split_whitespace().collect();
+        let date_parse: Vec<&str> = date.split_whitespace().collect();
 
         dates_sheet.push(String::from(date_parse[1]));
         dates_sheet.push(String::from(date_parse[3]));
@@ -36,22 +34,23 @@ range : &Range<DataType,
 Return : un booléen correspondant
  */
 pub fn read_state(range: &Range<DataType>) -> bool {
-    let value = match range.get_value((4,2)) {
-        None | Some(DataType::Empty) => {Err("Erreur cellule vide")},
-        Some(d) => {
-            let s = d.get_string().unwrap();
-            if s == "Refusé" {Ok(false)}
-            else if s == "Validé par l'administration" {Ok(true)}
-            else if s == "Validé aux conditions en commentaire" {
-                let comment = range.get_value((3,2))
-                    .unwrap();
-                println!("{}", comment);
-                Ok(true)
-            }
-            else {Err("Cas non pris en compte")}
+    let value = range.get_value((4,2)).unwrap().to_string();
+    let value_b = value.as_str();
+        
+    match value_b {
+        "Refusé" => {return false},
+        "Validé par l'administration" => {return true;},
+        "Validé aux conditions en commentaire" => {
+            let comment = range.get_value((3,2))
+                .unwrap();
+            println!("{}", comment);
+            return true;
         },
-    };
-    return value.unwrap();
+        _ => {
+            println!("Cas non pris en compte");
+            return true;
+        },
+    }
 }
 
 

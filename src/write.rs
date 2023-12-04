@@ -168,11 +168,12 @@ pub fn init_event(worksheet: &mut Worksheet, sheets: &Vec<&String>, first_row: u
     let mut k = 0;
 
     for s in sheets {
-        let slice = &s[14..s.len()];
+        let parse: Vec<&str> = s.split_whitespace().collect();
+        let slice = parse[2..].join(" ");
         let format = Format::new()
             .set_background_color(XlsxColor::RGB(COLORS[k]))
             .set_border(FormatBorder::Thin);
-        worksheet.write_string_with_format(i as u32, 0, slice, &format).unwrap();
+        worksheet.write_string_with_format(i as u32, 0, &slice, &format).unwrap();
         i += 1;
         k += 1;
     }
@@ -198,8 +199,8 @@ pub fn fill_peoples(worksheet: &mut Worksheet, sheets: &Vec<&String>, peoples_in
 
     for i in 0..sheets.len() {
         for j in 1..peoples_info[i].len() {
-            let n = j/8;
-            println!("{}, {}, {}",i,j,n);
+            let _n = j/8;
+            //println!("{}, {}, {}",i,j,n);
             if i%2 == 0 {_format = format_clair.clone();} 
             else {_format = format_sombre.clone();}
 
